@@ -1,4 +1,87 @@
-# Load Packages
+# Host control of persistent Epstein–Barr virus infection
+
+## Part 1: Paper Summary
+
+The paper investigates the biological basis of host control of
+persistent Epstein-Barr virus (EBV) infection. EBVread was used to
+detect increased viral load in blood cells which was associated with HIV
+infection, immunosuppressive drug intake, and smoking status. They used
+blood-based genome sequence data from UK BioBank (486,315) and All of Us
+(336,123) participants and found short read-pairs mapping to EBV genome
+in 38% of the total samples. GWAS of EBVread showed strong association
+with the major histocompatibility complex, 54 independent human
+leukocyte antigen alleles of MHC class I and II. They also found
+epistasis, when a gene inhibits/modifies the expression of a non-allelic
+gene, in the ERAP2 locus. Individuals with multiple sclerosis had a
+higher polygenic burden of EBVread for MHC class I HLA alleles and same
+burden increase was seen in individuals with rheumatoid arthritis at MHC
+class II. The also conducted a PheWAS which found that a polygenic
+overlap of EBVread with inflammatory bowel disease, hypothyrodism, and
+type 1 diabetes.
+
+## Part 2: Rationale, Methods, and Results
+
+They conducted analysis on UK biobank and All of Us data separately to
+collect high quality SNPs and gene association and then combined them
+for further analysis with GWAS, fine-mapping, gene-gene interaction,
+enrichment analysis, and PheWAS.
+
+#### 1. GWAS
+
+After identifying common variants in the cohort and HLA alleles the
+conducted GWAS on the EBV reads. Variant inclusion criteria was MAC
+&gt;= 25 (predicted). GWAS was used to discover loci/variants associated
+with immune response variation. They compared the GWAS data for memory B
+cell abundance and human herpesvirus 7 (HHV7). GWAS relies on proper QC
+of population structures and phenotype measurement, which if violated
+weaken the association we see. Looking at the QC process I don’t think
+these were violated. They did find variants in the MHC region and other
+HLA loci, which points towards immune pathways being associated. Their
+Manhatten plot had numerous strong associations and they had a large
+sample size but casual interpretation is limited in GWAS studies because
+it could also be indicative by linkage disequilibrium.
+
+#### 2. Fine-mapping
+
+Fine mapping refines the GWAS signals, allowing them to better interpret
+the loci in the MHC region and HLA alleles. This step relies on
+imputation accuracy which they also pointed out as a challenge in these
+specific, possible that some association were missed or caused by
+linkage disequilibrium. They did exclude individuals that lacked
+imputation data in the QC and association steps. Cis-eQTL identified 18
+variant-gene-cell-type association, mostly for ERAP2
+
+#### 3. MAGMA
+
+MAGMA integrates gene-based p-values into a gene set testing framework
+which tests whether genes in a set are more strongly associated with the
+phenotype. The authors used it to see if a specific biological pathway
+or gene set is statistically significant. They found that IEI genes were
+significant. This I think is in line with their goal, which was to see
+if immune cell pathways are significant in EBV persistence. The only
+thing I could think of as skew or violating the claim would be if the
+SNP were not accurately coded to the gene sets which could make the IEI
+genes a bit less significant but not completely take away the results
+from previous analysis, maybe make other immune pathways more
+significant.
+
+#### 5. PheWAS
+
+PheWAS introduces reverse genetics approach to see if the genes/
+variants we found are associated with multiple phenotypes. Apart from
+Sjorgren disease, all PheCodes were EBV-associated diseases. Which is
+what the authors were looking for to make sure the genes are not
+associated with another disease which they would have to look into with
+further analysis. This step heavily relies on the phenocodes are encoded
+properly in health records. Misclassification could cause random disease
+or even important ones to be left out of the results, making the
+reliability questionable. The results for this is definitely more
+suggestive and associatitive than casual since the EHR phenocodes are
+not easiest to ensure accuracy on I would say.
+
+## Part 3: Vibe-Replication (Code + Explanation)
+
+### Load Packages
 
     library(readxl)
     library(AnnotationDbi)
@@ -88,7 +171,7 @@
     ## ✖ dplyr::slice()        masks IRanges::slice()
     ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
-# Attempted Reproduction
+### Attempted Reproduction
 
 We will be attempting to reproduce the gene-set analysis using
 [MAGMA](https://cncr.nl/research/magma/) from the “Gene-based analyses
@@ -112,7 +195,7 @@ Biological Process annotations. While the paper did not specify how they
 did these, we will proceed with the GO annotations using `gprofiler2`
 and `ggplot`.
 
-### 1. Load the data and MAGMA binary
+#### 1. Load the data and MAGMA binary
 
 We need to load: - The magma standalone binary (since this isn’t loaded
 on the cluster) - The GWAS summary data from Locus Zoom - The European
@@ -135,7 +218,7 @@ nightmare in gene naming/identification.
     fi
     ./get_data.sh
 
-### 2. Cleanup the GWAS Summary Data from LocusZoom
+#### 2. Cleanup the GWAS Summary Data from LocusZoom
 
 We need to split the LocusZoom summary data into two files for input
 into MAGMA: - a SNP location file for the annotation step - a SNP
@@ -182,7 +265,7 @@ region as they do in the paper
       quote = FALSE
     )
 
-### 3. Prepare the IEI Gene Set File
+#### 3. Prepare the IEI Gene Set File
 
     gene_table = read_xlsx("data/IEI.xlsx")
 
@@ -278,7 +361,7 @@ region as they do in the paper
       append = TRUE
     )
 
-### 4. Run the MAGMA Pipeline
+#### 4. Run the MAGMA Pipeline
 
 1.  Run SNP to Gene Annotation with MAGMA
 2.  Run Gene-level Analysis with MAGMA
@@ -288,7 +371,7 @@ region as they do in the paper
 
     ./run_magma.sh
 
-### 5. Overview of the Results with a Figure
+#### 5. Overview of the Results with a Figure
 
 Recreation of “Fig. 3: Characterization of non-MHC risk loci associated
 with EBVread+.” Section “b”:
@@ -398,13 +481,13 @@ with EBVread+.” Section “b”:
     ## 4 13.728127
     ## 5 14.193188
 
-# Our Reproduction vs Original Paper
+#### Our Reproduction vs Original Paper
 
 Our results are found in the `./data/ebv_gwas_IEI.gsa.out`.
 
-## Their Results
+##### Their Results
 
-### IEI Genes
+###### IEI Genes
 
 Given the p-value is less than 0.05, they can say that the IEI genes are
 enriched compared to non-IEI genes by 0.19 units.
@@ -415,7 +498,7 @@ enriched compared to non-IEI genes by 0.19 units.
 - Number of Genes = 456
 - Bonferroni Corrected P &lt; 6.5 × 10−6; n = 7,743
 
-### Genes that cause monogenic EBV-driven lymphoproliferative diseases
+###### Genes that cause monogenic EBV-driven lymphoproliferative diseases
 
 Given the p-value is greater than 0.05, they conclude that say that the
 monogenic EBV-driven lymphoproliferative disease related genes are not
@@ -427,32 +510,34 @@ size for these genes are higher than the
 - s.e.m. (AKA SE) = 0.22
 - Number of Genes = 14
 
-## Our Results:
+##### Our Results:
 
-### IEI Genes
+###### IEI Genes
 
 We come to the same conclusion as the paper with a higher p-value and
 lower beta, signifying overall less impressive results for the IEI
 genes. This may be due to the 23 missing genes from our set.
 
-VARIABLE TYPE NGENES BETA BETA\_STD SE P
-
-IEI SET 433 0.14181 0.021631 0.044734 0.00076351
+- P = 0.00076351
+- beta = 0.14181
+- s.e.m. (AKA SE) = 0.044734
+- Number of Genes = 433
 
 Bonferroni Corrected P &lt; 2.75e-06; n = 18,167
 
-### Genes that cause monogenic EBV-driven lymphoproliferative diseases
+###### Genes that cause monogenic EBV-driven lymphoproliferative diseases
 
 This is by far the biggest difference. Our results for the monogenic
 EBV-driven lymphoproliferative disease related genes not only reached
 statistical significance, but also lead to a much higher beta of about
 0.61.
 
-VARIABLE TYPE NGENES BETA BETA\_STD SE P
+- P = 0.016866
+- beta = 0.60817
+- s.e.m. (AKA SE) = 0.28641
+- Number of Genes = 11
 
-Lymph\_Disease SET 11 0.60817 0.014961 0.28641 0.016866
-
-## Conclusion
+##### Conclusion
 
 While the original paper landed on 30 <GO:BP> results and appears to
 have chosen to show the top 30, our analysis only returned 22 biological
@@ -471,7 +556,7 @@ consistent with the
 [literature](https://pubmed.ncbi.nlm.nih.gov/40598900/) and also
 [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).,
 
-# AI Usage
+##### AI Usage
 
 My AI usage for this assignment can be summed up as moderately helpful.
 I mostly began with Claude, then ChatGPT, followed by Google’s AI
@@ -496,16 +581,16 @@ GO terms and was directed to use the `gprofiler2` R package. The paper
 did not distinguish how they mapped to the GO biological process
 ontology.
 
-# Division of Work
+## Division of Work
 
 Shane did the “Vibe-Replication (Code + Explanation)” and Kash did the
 “Paper Summary (brief)” and “Rationale, Methods, and Results”. Worked in
 a “divide and conquer” followed by a get together where we taught each
 other our respective contributions. No disagreements to mention.
 
-## Understanding and Difficulties
+### Understanding and Difficulties
 
-### Shane
+#### Shane
 
 Overall, I had issues trying to get the data in a clear and consistent
 way. Everyone seems to have their own way of storing data as some random
@@ -518,4 +603,27 @@ than before AI) to ge to a solution. Honestly, AI does kind of make
 these replication do-able in a day or two whereas in the past it would
 be a much larger project.
 
-### Kash
+#### Kash
+
+Through this assignment I was able to understand how much annotation and
+QC play a part before any analysis can be done on the dataset. Going
+into the paper I thought that the same QC line could be run for cleaning
+and filtering both data sets but that was not the case. Thinking back to
+2071, it really reinforced looking at the data a lot of different ways
+and doing plenty research to avoid weakening reproducibility of the
+statistical analysis. I was definitely reviewing the lecture slides a
+lot since the language in the paper was every to the point and a prior
+knowledge of the analysis tools is essential to ensure you don’t run
+into false positives and results. Looking at the plots was definitely
+beneficial to understand the results. Even at the end of the paper and
+reading the discussion there was still a lot of gray zone that couldn’t
+confirm causality which shows the importance of experiment design ( i
+guess pointing back to why good quality analysis is important to not
+waste research resources on wrong analysis). Learning in the class is
+heavily focused on working with one tool or a couple tools at a time but
+combing it all for a paper is more tedious in real life. I think the
+biggest take away for me was the importance of proper background
+research of genes and variants to make sure your annotation is accurate
+so you don’t have to worry about downstream analysis violation like LD,
+FDR, and population difference since those can be very troublesome and
+skew the analysis results.
