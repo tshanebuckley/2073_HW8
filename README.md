@@ -435,8 +435,9 @@ We come to the same conclusion as the paper with a higher p-value and
 lower beta, signifying overall less impressive results for the IEI
 genes. This may be due to the 23 missing genes from our set.
 
-VARIABLE TYPE NGENES BETA BETA\_STD SE P IEI SET 433 0.14181 0.021631
-0.044734 0.00076351
+VARIABLE TYPE NGENES BETA BETA\_STD SE P
+
+IEI SET 433 0.14181 0.021631 0.044734 0.00076351
 
 Bonferroni Corrected P &lt; 2.75e-06; n = 18,167
 
@@ -447,8 +448,9 @@ EBV-driven lymphoproliferative disease related genes not only reached
 statistical significance, but also lead to a much higher beta of about
 0.61.
 
-VARIABLE TYPE NGENES BETA BETA\_STD SE P Lymph\_Disease SET 11 0.60817
-0.014961 0.28641 0.016866
+VARIABLE TYPE NGENES BETA BETA\_STD SE P
+
+Lymph\_Disease SET 11 0.60817 0.014961 0.28641 0.016866
 
 ## Conclusion
 
@@ -465,7 +467,7 @@ process, of which, only 5 were significant:
 While the original paper appeared to return results that lead towards
 the importance of many different types of immune cells, our results are
 more around how EBV alters the host epigenetically. These results are
-consistent with a the
+consistent with the
 [literature](https://pubmed.ncbi.nlm.nih.gov/40598900/) and also
 [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).,
 
